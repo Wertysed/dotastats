@@ -1,0 +1,21 @@
+all stats of player (https://api.opendota.com/api/players/{account_id})
+
+wl(all)(https://api.opendota.com/api/players/{account_id}/wl)
+
+stats for matches(https://api.opendota.com/api/players/{account_id}/matches)
+
+stats for last match(https://api.opendota.com/api/players/ID_OF_PLAYER/rec..)(всегда выводить первым id_of_player)
+
+stats for hero(all)(https://api.opendota.com/api/players/{account_id}/heroes)
+
+stats with friend(https://api.opendota.com/api/players/1084744980/peers)
+
+stats of the last spoken word
+(https://api.opendota.com/api/players/1084744980/wordc..)(можно сделать с героями) РАБОТАЕТ ОЧЕНЬ СТРАННО!
+
+stats for team(https://api.opendota.com/api/teams/ID_OF_TEAM)
+
+stats for all players of team (https://api.opendota.com/api/teams/ID_OF_TEAM/players)(добавить отсечение бывших участников)
+
+stats for all heroes of team
+(https://api.opendota.com/api/teams/ID_OF_TEAM/heroes)
