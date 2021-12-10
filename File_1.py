@@ -1,17 +1,4 @@
 import requests
-from collections.abc import Iterator
-import json
-
-url = 'https://api.opendota.com/api/players/1084744980'
-url_2 = 'https://api.opendota.com/api/matches/6310996743'
-url_3 = 'https://api.opendota.com/api/players/6313647601/wordcloud?hero_id=84'
-url_4 = 'https://api.opendota.com/api/heroes'
-url_5 = 'https://api.opendota.com/api/heroes/11/itemPopularity'
-url_6 = 'https://api.opendota.com/api/teams/'
-
-url_8 = 'https://api.opendota.com/api/players/998767228/matches'
-
-
 
 
 class DotaAPI:
@@ -68,9 +55,6 @@ class DotaAPI:
                         print(key_1, ":", value_2)
                 else:
                     print(key, ':', value)
-        elif way == 3:
-            for key, value in request_api.items():  # не нужен, наверное
-                print(key, ":", value)
 
     @classmethod
     def stats_of_player(cls, id_of_player):
@@ -90,11 +74,63 @@ class DotaAPI:
             abobus_new = requests.get(url_new).json()
             return cls.information_output(abobus_new, 2)
 
+    @classmethod
+    def stats_with_peers(cls, id_of_player):
+        url = f'{cls.BASE_URL}players/{id_of_player}/peers'
+        abobus = requests.get(url).json()
+        return cls.information_output(abobus, 1)
+
+    @classmethod
+    def stats_of_word(cls, id_of_player, name_of_hero):
+        url = f'{cls.BASE_URL}players/{id_of_player}/wordcloud'
+        abobus = requests.get(url).json()
+        if name_of_hero == 'all':
+            print(abobus)
+            return cls.information_output(abobus, 2)
+        else:
+            id_of_hero = cls.search_id_of_hero(name_of_hero)
+            url_new = f'{url}?hero_id={id_of_hero}'
+            abobus_new = requests.get(url_new).json()
+            print(abobus_new)
+            return cls.information_output(abobus_new, 2)
+
+    @classmethod
+    def stats_of_team(cls, name_of_team):
+        id_of_team = cls.search_id_of_team(name_of_team)
+        url = f'{cls.BASE_URL}teams/{id_of_team}'
+        abobus = requests.get(url).json()
+        return cls.information_output(abobus, 2)
+
+    @classmethod
+    def stats_of_all_team_players(cls, name_of_team):
+        id_of_team = cls.search_id_of_team(name_of_team)
+        url = f'{cls.BASE_URL}teams/{id_of_team}/players'
+        abobus = requests.get(url).json()
+        for i in abobus:
+            if i['is_current_team_member']:
+                for key, value in i.items():
+                    print(key, ':', value)
+
+    @classmethod
+    def stats_of_all_team_hero(cls, name_of_team, name_of_hero):
+        id_of_team = cls.search_id_of_team(name_of_team)
+        id_of_hero = cls.search_id_of_hero(name_of_hero)
+        url = f'{cls.BASE_URL}teams/{id_of_team}/heroes'
+        abobus = requests.get(url).json()
+        for i in abobus:
+            if i['hero_id'] == id_of_hero:
+                cls.information_output(i, 2)
 
 
-
-print('пример рекорда', DotaAPI.record_search(339665220, 'kills', 'all'))
-print('пример поиска id команды по названию', DotaAPI.search_id_of_team('PSG.LGD'))
-print('пример получения id по названию героя', DotaAPI.search_id_of_hero('Slark'))
-print('пример получения статы игрока', DotaAPI.stats_of_player(339665220))
-print('пример получения статы побед и поражений', DotaAPI.wl_of_player(339665220, 'Slark'))
+print('пример рекорда', DotaAPI.record_search(339665220, 'kills', 'all'))  # внешний функционал
+print('пример поиска id команды по названию', DotaAPI.search_id_of_team('PSG.LGD'))  # внутренний функционал
+print('пример получения id по названию героя', DotaAPI.search_id_of_hero('Slark'))  # внутренний функционал
+print('пример получения статы игрока', DotaAPI.stats_of_player(339665220))  # внешний функционал
+print('пример получения статы побед и поражений', DotaAPI.wl_of_player(339665220, 'Slark'))  # внешний функционал
+print('пример статы с друзьями', DotaAPI.stats_with_peers(1084744980))  # внешний функционал
+print('пример вывода ласт слов', DotaAPI.stats_of_word(1084744980, 'Luna'))  # внешний функционал
+print('пример получения статы про команд', DotaAPI.stats_of_team('Team Spirit'))  # внешний функционал
+print('пример получения статы для каждого игорка(играющего)', DotaAPI.stats_of_all_team_players('PSG.LGD'))  #
+# внешний функционал
+print('пример получения статы с определнным героем', DotaAPI.stats_of_all_team_hero('Team Spirit', 'Magnus'))  #
+# внешний функционал
