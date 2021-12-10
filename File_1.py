@@ -1,11 +1,17 @@
 import requests
+import discord
+from discord.ext import commands
+from config import settings
+
+bot = commands.Bot(command_prefix=settings['prefix'])
+bot.remove_command('help')
 
 
 class DotaAPI:
     BASE_URL: str = 'https://api.opendota.com/api/'
 
     @classmethod
-    def record_search(cls, id_of_player, name_of_discipline: str, name_of_hero):
+    def record_search(cls, id_of_player, name_of_discipline: str, name_of_hero: str):
         max_discipline = 0
         url = f'{cls.BASE_URL}players/{id_of_player}/matches'
         matches = requests.get(url).json()
@@ -122,15 +128,64 @@ class DotaAPI:
                 cls.information_output(i, 2)
 
 
-print('пример рекорда', DotaAPI.record_search(339665220, 'kills', 'all'))  # внешний функционал
-print('пример поиска id команды по названию', DotaAPI.search_id_of_team('PSG.LGD'))  # внутренний функционал
-print('пример получения id по названию героя', DotaAPI.search_id_of_hero('Slark'))  # внутренний функционал
-print('пример получения статы игрока', DotaAPI.stats_of_player(339665220))  # внешний функционал
-print('пример получения статы побед и поражений', DotaAPI.wl_of_player(339665220, 'Slark'))  # внешний функционал
-print('пример статы с друзьями', DotaAPI.stats_with_peers(1084744980))  # внешний функционал
-print('пример вывода ласт слов', DotaAPI.stats_of_word(1084744980, 'Luna'))  # внешний функционал
-print('пример получения статы про команд', DotaAPI.stats_of_team('Team Spirit'))  # внешний функционал
-print('пример получения статы для каждого игорка(играющего)', DotaAPI.stats_of_all_team_players('PSG.LGD'))  #
+@bot.command()
+async def st_for_pl(ctx, argument):
+    argument = int(argument)
+    await ctx.send(DotaAPI.stats_of_player(argument))
+
+
+@bot.command()
+async def record(ctx, argument_1, argument_2, *, argument_3):
+    argument_1 = int(argument_1)
+    argument_2 = str(argument_2)
+    await ctx.send(DotaAPI.record_search(argument_1, argument_2, argument_3))
+
+
+@bot.command()
+async def wl(ctx, argument_1, *, argument_2):
+    argument_1 = int(argument_1)
+    await ctx.send(DotaAPI.wl_of_player(argument_1, argument_2))
+
+@bot.command()
+async def friends(ctx, argument):
+    argument = int(argument)
+    await ctx.send(DotaAPI.stats_with_peers(argument))
+
+@bot.command()
+async def wordcloud(ctx, argument_1, *, argument_2):
+    argument_1 = int(argument_1)
+    await ctx.send(DotaAPI.stats_of_word(argument_1, argument_2))
+
+@bot.command()
+async def team(ctx, *, argument):
+    await ctx.send(DotaAPI.stats_of_team(argument))
+
+@bot.command()
+async def team_player(ctx, *, argument):
+    await ctx.send(DotaAPI.stats_of_all_team_players(argument))
+
+@bot.command()
+async def team_hero(ctx, argument_1, *, argument_2):
+    argument_1 = argument_1.replace('_', ' ')
+    await ctx.send(DotaAPI.stats_of_all_team_hero(argument_1 , argument_2))
+
+
+bot.run(settings['token'])
+
+
+
+
+
+
+# print('пример рекорда', DotaAPI.record_search(339665220, 'kills', 'all'))  # внешний функционал
+# print('пример поиска id команды по названию', DotaAPI.search_id_of_team('PSG.LGD'))  # внутренний функционал
+# print('пример получения id по названию героя', DotaAPI.search_id_of_hero('Slark'))  # внутренний функционал
+# print('пример получения статы игрока', DotaAPI.stats_of_player(339665220))  # внешний функционал
+# print('пример получения статы побед и поражений', DotaAPI.wl_of_player(339665220, 'Slark'))  # внешний функционал
+# print('пример статы с друзьями', DotaAPI.stats_with_peers(1084744980))  # внешний функционал
+# print('пример вывода ласт слов', DotaAPI.stats_of_word(1084744980, 'Luna'))  # внешний функционал
+# print('пример получения статы про команд', DotaAPI.stats_of_team('Team Spirit'))  # внешний функционал
+# print('пример получения статы для каждого игорка(играющего)', DotaAPI.stats_of_all_team_players('PSG.LGD'))  #
 # внешний функционал
-print('пример получения статы с определнным героем', DotaAPI.stats_of_all_team_hero('Team Spirit', 'Magnus'))  #
+# print('пример получения статы с определнным героем', DotaAPI.stats_of_all_team_hero('Team Spirit', 'Magnus'))  #
 # внешний функционал
